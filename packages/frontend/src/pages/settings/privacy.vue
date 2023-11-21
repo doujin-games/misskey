@@ -49,6 +49,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 				<template v-else-if="defaultNoteVisibility === 'specified'" #suffix>{{ i18n.ts._visibility.specified }}</template>
 
 				<div class="_gaps_m">
+					<MkInfo>このサーバでは「デフォルトの公開範囲」に「パブリック」は選択できません</MkInfo>
 					<MkSelect v-model="defaultNoteVisibility">
 						<!-- <option value="public">{{ i18n.ts._visibility.public }}</option> -->
 						<option value="home">{{ i18n.ts._visibility.home }}</option>
@@ -71,6 +72,7 @@ import MkSwitch from '@/components/MkSwitch.vue';
 import MkSelect from '@/components/MkSelect.vue';
 import FormSection from '@/components/form/section.vue';
 import MkFolder from '@/components/MkFolder.vue';
+import MkInfo from '@/components/MkInfo.vue';
 import * as os from '@/os.js';
 import { defaultStore } from '@/store.js';
 import { i18n } from '@/i18n.js';
