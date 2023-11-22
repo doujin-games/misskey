@@ -27,6 +27,11 @@ export class RegistryApiService {
 	public async set(userId: MiUser['id'], domain: string | null, scope: string[], key: string, value: any) {
 		// TODO: 作成できるキーの数を制限する
 
+		if (key === 'defaultNoteVisibility' && value === 'public') {
+			// eslint-disable-next-line no-param-reassign
+			value = 'home';
+		}
+
 		const query = this.registryItemsRepository.createQueryBuilder('item');
 		if (domain) {
 			query.where('item.domain = :domain', { domain: domain });
