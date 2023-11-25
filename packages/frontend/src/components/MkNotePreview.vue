@@ -14,6 +14,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div>
 				<Mfm :text="text.trim()" :author="user" :nyaize="'respect'" :i="user"/>
 			</div>
+			<MkUrlPreview v-for="url in urls" :key="url" :url="url" :compact="true" :detail="false" :class="$style.urlPreview"/>
 		</div>
 	</div>
 </div>
@@ -21,12 +22,18 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 <script lang="ts" setup>
 import { } from 'vue';
+import * as mfm from 'mfm-js';
 import * as Misskey from 'misskey-js';
+import MkUrlPreview from '@/components/MkUrlPreview.vue';
+import { extractUrlFromMfm } from '@/scripts/extract-url-from-mfm.js';
 
 const props = defineProps<{
 	text: string;
 	user: Misskey.entities.User;
 }>();
+
+const parsed = $computed(() => props.text ? mfm.parse(props.text) : null);
+const urls = $computed(() => parsed ? extractUrlFromMfm(parsed) : null);
 </script>
 
 <style lang="scss" module>
@@ -75,5 +82,10 @@ const props = defineProps<{
 		width: 48px !important;
 		height: 48px !important;
 	}
+}
+
+.urlPreview {
+	margin-top: 8px;
+	margin-bottom: 8px;
 }
 </style>
