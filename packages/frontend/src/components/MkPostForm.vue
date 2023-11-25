@@ -270,6 +270,8 @@ const urls = $computed((): string[] => {
 });
 
 const hasSensitiveUrls = $computed((): boolean => {
+	if (useCw === true) return false;
+
 	const sensitiveUrls = [
 		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
 		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
