@@ -66,11 +66,9 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
 	<MkInfo v-if="hasSensitiveUrls" :class="$style.hasSensitiveUrls">
-		このサーバーでは下記サイトのURLプレビューは無効化されます。
+		次のURLはプレビューが無効化されます。
 		<ul>
-			<li>DLsite（成人向けコーナーのみ）</li>
-			<li>Ci-en（成人向けドメインのみ）</li>
-			<li>FANZA</li>
+			<li v-for="sensitiveUrl in sensitiveUrls" :key="sensitiveUrl">{{ sensitiveUrl }}</li>
 		</ul>
 	</MkInfo>
 	<input v-show="useCw" ref="cwInputEl" v-model="cw" :class="$style.cw" :placeholder="i18n.ts.annotation" @keydown="onKeydown">
@@ -269,15 +267,18 @@ const urls = $computed((): string[] => {
 	return extractUrlFromMfm(note);
 });
 
-const hasSensitiveUrls = $computed((): boolean => {
-	if (useCw === true) return false;
+const sensitiveUrls = $computed((): string[] => {
+	if (useCw === true) return [];
 
-	const sensitiveUrls = [
+	const sensitiveUrlRegexList = [
 		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
 		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
 		/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
 	];
-	return urls.filter(url => sensitiveUrls.some(sensitiveUrl => url.match(sensitiveUrl))).length > 0;
+	return urls.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
+});
+const hasSensitiveUrls = $computed((): boolean => {
+	return sensitiveUrls.length > 0;
 });
 
 watch($$(text), () => {
