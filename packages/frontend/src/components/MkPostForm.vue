@@ -66,7 +66,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	</div>
 	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
 	<MkInfo v-if="hasSensitiveUrls" :class="$style.hasSensitiveUrls">
-		次のURLはプレビューが無効化されます。
+		次のリンクはプレビューが無効化されます。
 		<ul>
 			<li v-for="sensitiveUrl in sensitiveUrls" :key="sensitiveUrl">{{ sensitiveUrl }}</li>
 		</ul>
