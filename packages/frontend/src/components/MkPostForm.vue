@@ -272,8 +272,11 @@ const sensitiveUrls = $computed((): string[] => {
 
 	const sensitiveUrlRegexList = [
 		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
-		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
 		/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
+		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
+		/http(s)?:\/\/(www\.)?[^.]+\.fanbox\.cc\//,
+		/http(s)?:\/\/(www\.)?fantia\.jp\//,
+		/http(s)?:\/\/(www\.)?pixiv\.net\//,
 	];
 	return urls.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
 });
