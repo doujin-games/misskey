@@ -378,6 +378,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 		];
 		const tokens = (data.text ? mfm.parse(data.text) : []);
 		data.text = mfm.toString(tokens.map(token => {
+			if (data.cw) return token;
+
 			if (token.type === 'url') {
 				if (!sensitiveUrls.some(url => url.test(token.props.url))) return token;
 				return mfm.LINK(true, token.props.url, [mfm.TEXT(token.props.url)]);
