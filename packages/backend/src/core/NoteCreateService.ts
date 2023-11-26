@@ -368,6 +368,31 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
+		const sensitiveUrls = [
+			/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
+			/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
+			/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
+			/http(s)?:\/\/(www\.)?[^.]+\.fanbox\.cc\//,
+			/http(s)?:\/\/(www\.)?fantia\.jp\//,
+			/http(s)?:\/\/(www\.)?pixiv\.net\//,
+		];
+		const tokens = (data.text ? mfm.parse(data.text) : []);
+		data.text = mfm.toString(tokens.map(token => {
+			if (data.cw) return token;
+
+			if (token.type === 'url') {
+				if (!sensitiveUrls.some(url => url.test(token.props.url))) return token;
+				return mfm.LINK(true, token.props.url, [mfm.TEXT(token.props.url)]);
+			}
+			if (token.type === 'link') {
+				if (token.props.silent) return token;
+				if (!sensitiveUrls.some(url => url.test(token.props.url))) return token;
+				token.props.silent = true;
+				return token;
+			}
+			return token;
+		}));
+
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
 
 		setImmediate('post created', { signal: this.#shutdownController.signal }).then(

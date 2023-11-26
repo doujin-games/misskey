@@ -65,6 +65,12 @@ SPDX-License-Identifier: AGPL-3.0-only
 		</div>
 	</div>
 	<MkInfo v-if="hasNotSpecifiedMentions" warn :class="$style.hasNotSpecifiedMentions">{{ i18n.ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ i18n.ts.add }}</button></MkInfo>
+	<MkInfo v-if="hasSensitiveUrls" :class="$style.hasSensitiveUrls">
+		次のリンクはプレビューが無効化されます。
+		<ul>
+			<li v-for="sensitiveUrl in sensitiveUrls" :key="sensitiveUrl">{{ sensitiveUrl }}</li>
+		</ul>
+	</MkInfo>
 	<input v-show="useCw" ref="cwInputEl" v-model="cw" :class="$style.cw" :placeholder="i18n.ts.annotation" @keydown="onKeydown">
 	<div :class="[$style.textOuter, { [$style.withCw]: useCw }]">
 		<textarea ref="textareaEl" v-model="text" :class="[$style.text]" :disabled="posting || posted" :placeholder="placeholder" data-cy-post-form-text @keydown="onKeydown" @paste="onPaste" @compositionupdate="onCompositionUpdate" @compositionend="onCompositionEnd"/>
@@ -124,6 +130,7 @@ import { deepClone } from '@/scripts/clone.js';
 import MkRippleEffect from '@/components/MkRippleEffect.vue';
 import { miLocalStorage } from '@/local-storage.js';
 import { claimAchievement } from '@/scripts/achievements.js';
+import { extractUrlFromMfm } from '@/scripts/extract-url-from-mfm.js';
 
 const modal = inject('modal');
 
@@ -254,6 +261,28 @@ const canPost = $computed((): boolean => {
 
 const withHashtags = $computed(defaultStore.makeGetterSetter('postFormWithHashtags'));
 const hashtags = $computed(defaultStore.makeGetterSetter('postFormHashtags'));
+
+const urls = $computed((): string[] => {
+	const note = mfm.parse(text);
+	return extractUrlFromMfm(note);
+});
+
+const sensitiveUrls = $computed((): string[] => {
+	if (useCw === true) return [];
+
+	const sensitiveUrlRegexList = [
+		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
+		/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
+		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
+		/http(s)?:\/\/(www\.)?[^.]+\.fanbox\.cc\//,
+		/http(s)?:\/\/(www\.)?fantia\.jp\//,
+		/http(s)?:\/\/(www\.)?pixiv\.net\//,
+	];
+	return urls.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
+});
+const hasSensitiveUrls = $computed((): boolean => {
+	return sensitiveUrls.length > 0;
+});
 
 watch($$(text), () => {
 	checkMissingMention();
@@ -1110,6 +1139,10 @@ defineExpose({
 }
 
 .hasNotSpecifiedMentions {
+	margin: 0 20px 16px 20px;
+}
+
+.hasSensitiveUrls {
 	margin: 0 20px 16px 20px;
 }
 
