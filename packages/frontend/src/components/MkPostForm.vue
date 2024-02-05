@@ -271,7 +271,7 @@ const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtag
 const hashtags = computed(defaultStore.makeGetterSetter('postFormHashtags'));
 
 const urls = computed((): string[] => {
-	const note = mfm.parse(text);
+	const note = mfm.parse(text.value);
 	return extractUrlFromMfm(note);
 });
 
@@ -286,10 +286,10 @@ const sensitiveUrls = computed((): string[] => {
 		/http(s)?:\/\/(www\.)?fantia\.jp\//,
 		/http(s)?:\/\/(www\.)?pixiv\.net\//,
 	];
-	return urls.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
+	return urls.value.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
 });
 const hasSensitiveUrls = computed((): boolean => {
-	return sensitiveUrls.length > 0;
+	return sensitiveUrls.value.length > 0;
 });
 
 watch(text, () => {
