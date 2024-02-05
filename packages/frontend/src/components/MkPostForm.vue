@@ -270,12 +270,12 @@ const canPost = computed((): boolean => {
 const withHashtags = computed(defaultStore.makeGetterSetter('postFormWithHashtags'));
 const hashtags = computed(defaultStore.makeGetterSetter('postFormHashtags'));
 
-const urls = $computed((): string[] => {
+const urls = computed((): string[] => {
 	const note = mfm.parse(text);
 	return extractUrlFromMfm(note);
 });
 
-const sensitiveUrls = $computed((): string[] => {
+const sensitiveUrls = computed((): string[] => {
 	if (useCw === true) return [];
 
 	const sensitiveUrlRegexList = [
@@ -288,7 +288,7 @@ const sensitiveUrls = $computed((): string[] => {
 	];
 	return urls.filter(url => sensitiveUrlRegexList.some(regex => regex.test(url)));
 });
-const hasSensitiveUrls = $computed((): boolean => {
+const hasSensitiveUrls = computed((): boolean => {
 	return sensitiveUrls.length > 0;
 });
 
