@@ -368,7 +368,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (!data.renote) {
+		if (data.text) {
 			const sensitiveUrls = [
 				/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
 				/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
