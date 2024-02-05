@@ -496,8 +496,8 @@ function setVisibility() {
 		changeVisibility: v => {
 			visibility.value = v;
 			if (defaultStore.state.rememberNoteVisibility) {
-				if (visibility === 'public') {
-					visibility = 'home';
+				if (visibility.value === 'public') {
+					visibility.value = 'home';
 				}
 				defaultStore.set('visibility', visibility.value);
 			}
