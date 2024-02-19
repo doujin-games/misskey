@@ -151,7 +151,7 @@ export const defaultStore = markRaw(new Storage('base', {
 	},
 	visibility: {
 		where: 'deviceAccount',
-		default: 'public' as 'public' | 'home' | 'followers' | 'specified',
+		default: 'home' as 'public' | 'home' | 'followers' | 'specified',
 	},
 	localOnly: {
 		where: 'deviceAccount',
@@ -431,10 +431,10 @@ export const defaultStore = markRaw(new Storage('base', {
 			sfxVolume: 1,
 		},
 	},
-  hemisphere: {
+	hemisphere: {
 		where: 'device',
 		default: hemisphere as 'N' | 'S',
-  },
+	},
 	enableHorizontalSwipe: {
 		where: 'device',
 		default: true,
