@@ -277,7 +277,7 @@ const sensitiveUrls = computed((): string[] => {
 	if (useCw === true) return [];
 
 	const sensitiveUrlRegexList = [
-		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
+		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|aix|girls|bl)\//,
 		/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
 		/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
 		/http(s)?:\/\/(www\.)?[^.]+\.fanbox\.cc\//,
