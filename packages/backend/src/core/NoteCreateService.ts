@@ -59,6 +59,8 @@ import { UtilityService } from '@/core/UtilityService.js';
 import { UserBlockingService } from '@/core/UserBlockingService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { trackPromise } from '@/misc/promise-tracker.js';
+import { isNotNull } from '@/misc/is-not-null.js';
+import { IdentifiableError } from '@/misc/identifiable-error.js';
 
 type NotificationType = 'reply' | 'renote' | 'quote' | 'mention';
 
@@ -150,8 +152,6 @@ type Option = {
 @Injectable()
 export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
-
-	public static ContainsProhibitedWordsError = class extends Error {};
 
 	constructor(
 		@Inject(DI.config)
@@ -263,8 +263,14 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (this.utilityService.isKeyWordIncluded(data.cw ?? data.text ?? '', meta.prohibitedWords)) {
-			throw new NoteCreateService.ContainsProhibitedWordsError();
+		const hasProhibitedWords = await this.checkProhibitedWordsContain({
+			cw: data.cw,
+			text: data.text,
+			pollChoices: data.poll?.choices,
+		}, meta.prohibitedWords);
+
+		if (hasProhibitedWords) {
+			throw new IdentifiableError('689ee33f-f97c-479a-ac49-1b9f8140af99', 'Note contains prohibited words');
 		}
 
 		const inSilencedInstance = this.utilityService.isSilencedHost(meta.silencedHosts, user.host);
@@ -359,17 +365,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 			mentionedUsers = data.apMentions ?? await this.extractMentionedUsers(user, combinedTokens);
 		}
 
-		const willCauseNotification = mentionedUsers.some(u => u.host === null)
-			|| (data.visibility === 'specified' && data.visibleUsers?.some(u => u.host === null))
-			|| data.reply?.userHost === null || (this.isQuote(data) && data.renote.userHost === null) || false;
-
-		if (user.host !== null && willCauseNotification) {
-			const userEntity = await this.usersRepository.findOneBy({ id: user.id });
-			if ((userEntity?.followersCount ?? 0) === 0) {
-				throw new Error('User has no local followers');
-			}
-		}
-
 		tags = tags.filter(tag => Array.from(tag).length <= 128).splice(0, 32);
 
 		if (data.reply && (user.id !== data.reply.userId) && !mentionedUsers.some(u => u.id === data.reply!.userId)) {
@@ -390,31 +385,8 @@ export class NoteCreateService implements OnApplicationShutdown {
 			}
 		}
 
-		if (data.text) {
-			const sensitiveUrls = [
-				/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
-				/http(s)?:\/\/(www\.)?dmm\.co\.jp\//,
-				/http(s)?:\/\/(www\.)?ci-en\.dlsite\.com\//,
-				/http(s)?:\/\/(www\.)?[^.]+\.fanbox\.cc\//,
-				/http(s)?:\/\/(www\.)?fantia\.jp\//,
-				/http(s)?:\/\/(www\.)?pixiv\.net\//,
-			];
-			const tokens = (data.text ? mfm.parse(data.text) : []);
-			data.text = mfm.toString(tokens.map(token => {
-				if (data.cw) return token;
-
-				if (token.type === 'url') {
-					if (!sensitiveUrls.some(url => url.test(token.props.url))) return token;
-					return mfm.LINK(true, token.props.url, [mfm.TEXT(token.props.url)]);
-				}
-				if (token.type === 'link') {
-					if (token.props.silent) return token;
-					if (!sensitiveUrls.some(url => url.test(token.props.url))) return token;
-					token.props.silent = true;
-					return token;
-				}
-				return token;
-			}));
+		if (mentionedUsers.length > 0 && mentionedUsers.length > (await this.roleService.getUserPolicies(user.id)).mentionLimit) {
+			throw new IdentifiableError('9f466dab-c856-48cd-9e65-ff90ff750580', 'Note contains too many mentions');
 		}
 
 		const note = await this.insertNote(user, data, tags, emojis, mentionedUsers);
@@ -855,7 +827,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 		const mentions = extractMentions(tokens);
 		let mentionedUsers = (await Promise.all(mentions.map(m =>
 			this.remoteUserResolveService.resolveUser(m.username, m.host ?? user.host).catch(() => null),
-		))).filter(x => x != null) as MiUser[];
+		))).filter(isNotNull);
 
 		// Drop duplicate users
 		mentionedUsers = mentionedUsers.filter((u, i, self) =>
@@ -1027,6 +999,23 @@ export class NoteCreateService implements OnApplicationShutdown {
 				isFollowerHibernated: true,
 			});
 		}
+	}
+
+	public async checkProhibitedWordsContain(content: Parameters<UtilityService['concatNoteContentsForKeyWordCheck']>[0], prohibitedWords?: string[]) {
+		if (prohibitedWords == null) {
+			prohibitedWords = (await this.metaService.fetch()).prohibitedWords;
+		}
+
+		if (
+			this.utilityService.isKeyWordIncluded(
+				this.utilityService.concatNoteContentsForKeyWordCheck(content),
+				prohibitedWords,
+			)
+		) {
+			return true;
+		}
+
+		return false;
 	}
 
 	@bindThis
