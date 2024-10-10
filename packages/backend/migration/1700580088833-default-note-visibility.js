@@ -1,3 +1,8 @@
+/*
+ * SPDX-FileCopyrightText: syuilo and misskey-project
+ * SPDX-License-Identifier: AGPL-3.0-only
+ */
+
 export class DefaultNoteVisibility1700580088833 {
     name = 'DefaultNoteVisibility1700580088833'
 
