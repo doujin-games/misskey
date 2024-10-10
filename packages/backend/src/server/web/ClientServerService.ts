@@ -770,25 +770,6 @@ export class ClientServerService {
 				return await renderBase(reply);
 			}
 		});
-
-		// Reversi game
-		fastify.get<{ Params: { game: string; } }>('/reversi/g/:game', async (request, reply) => {
-			const game = await this.reversiGamesRepository.findOneBy({
-				id: request.params.game,
-			});
-
-			if (game) {
-				const _game = await this.reversiGameEntityService.packDetail(game);
-				const meta = await this.metaService.fetch();
-				reply.header('Cache-Control', 'public, max-age=3600');
-				return await reply.view('reversi-game', {
-					game: _game,
-					...this.generateCommonPugData(meta),
-				});
-			} else {
-				return await renderBase(reply);
-			}
-		});
 		//#endregion
 
 		//#region noindex pages
