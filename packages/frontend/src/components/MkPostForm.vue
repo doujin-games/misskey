@@ -281,7 +281,7 @@ const urls = computed((): string[] => {
 });
 
 const sensitiveUrls = computed((): string[] => {
-	if (useCw === true) return [];
+	if (useCw.value === true) return [];
 
 	const sensitiveUrlRegexList = [
 		/http(s)?:\/\/(www\.)?dlsite\.com\/(maniax|books|pro|appx|girls|bl)\//,
@@ -1274,10 +1274,6 @@ html[data-color-scheme=light] .preview {
 }
 
 .hasNotSpecifiedMentions {
-	margin: 0 20px 16px 20px;
-}
-
-.hasSensitiveUrls {
 	margin: 0 20px 16px 20px;
 }
 
