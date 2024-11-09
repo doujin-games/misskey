@@ -1210,6 +1210,7 @@ hemisphere: "Geolocalització"
 withSensitive: "Incloure notes amb fitxers sensibles"
 userSaysSomethingSensitive: "La publicació de {name} conte material sensible"
 enableHorizontalSwipe: "Lliscar per canviar de pestanya"
+surrender: "Cancel·lar "
 _bubbleGame:
   howToPlay: "Com es juga"
   _howToPlay:
@@ -2254,4 +2255,3 @@ _externalResourceInstaller:
       title: "Paràmetres no vàlids "
 _reversi:
   total: "Total"
-

@@ -1209,6 +1209,7 @@ hemisphere: "Región"
 withSensitive: "Mostrar notas que contengan material sensible"
 userSaysSomethingSensitive: "La publicación de {name} contiene material sensible"
 enableHorizontalSwipe: "Deslice para cambiar de pestaña"
+surrender: "detener"
 _bubbleGame:
   howToPlay: "Cómo jugar"
   _howToPlay:
@@ -2447,4 +2448,3 @@ _reversi:
   reversi: "Reversi"
   won: "{name} ha ganado"
   total: "Total"
-
