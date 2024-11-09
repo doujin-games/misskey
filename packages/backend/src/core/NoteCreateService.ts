@@ -149,8 +149,6 @@ export class NoteCreateService implements OnApplicationShutdown {
 	#shutdownController = new AbortController();
 	private updateNotesCountQueue: CollapsedQueue<MiNote['id'], number>;
 
-	public static ContainsProhibitedWordsError = class extends Error {};
-
 	constructor(
 		@Inject(DI.config)
 		private config: Config,
